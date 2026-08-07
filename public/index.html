@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سامانه بلیط ورزشی</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+      <span class="navbar-brand">🏟️ سامانه بلیط ورزشی</span>
+      <div id="userArea" class="text-white"></div>
+    </div>
+  </nav>
+  <div class="container" id="app">
+    <!-- Login / Register -->
+    <div id="authSection" class="row">
+      <div class="col-md-6 offset-md-3">
+        <h3 id="authTitle">ورود / ثبت‌نام</h3>
+        <div class="mb-3">
+          <label>ایمیل</label>
+          <input type="email" id="email" class="form-control" placeholder="email@example.com">
+        </div>
+        <div class="mb-3" id="passwordGroup">
+          <label>رمز عبور (فقط برای ثبت‌نام)</label>
+          <input type="password" id="password" class="form-control">
+        </div>
+        <div class="mb-3" id="fullnameGroup" style="display:none;">
+          <label>نام کامل</label>
+          <input type="text" id="fullname" class="form-control">
+        </div>
+        <div class="mb-3" id="cityGroup" style="display:none;">
+          <label>شهر</label>
+          <input type="text" id="city" class="form-control">
+        </div>
+        <button class="btn btn-primary" id="requestOtpBtn">دریافت کد OTP</button>
+        <div id="otpSection" style="display:none; margin-top:10px;">
+          <input type="text" id="otpCode" class="form-control" placeholder="کد ۶ رقمی">
+          <button class="btn btn-success mt-2" id="verifyOtpBtn">تأیید کد</button>
+        </div>
+        <button class="btn btn-secondary mt-2" id="toggleRegisterBtn">ثبت‌نام (حساب جدید)</button>
+      </div>
+    </div>
+
+    <!-- Main Panel (after login) -->
+    <div id="mainPanel" style="display:none;">
+      <ul class="nav nav-tabs mb-3" id="mainTabs">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#searchTab">جستجوی بلیط</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#bookingsTab">تاریخچه خرید</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#profileTab">پروفایل</a></li>
+        <li class="nav-item" id="adminTab" style="display:none;"><a class="nav-link" data-bs-toggle="tab" href="#adminPanel">پنل پشتیبان</a></li>
+      </ul>
+      <div class="tab-content">
+        <!-- Search Tab -->
+        <div class="tab-pane fade show active" id="searchTab">
+          <div class="row mb-3">
+            <div class="col-md-3"><input class="form-control" placeholder="نوع ورزش (مثال football)" id="sportFilter"></div>
+            <div class="col-md-3"><input class="form-control" placeholder="شهر" id="cityFilter"></div>
+            <div class="col-md-3"><input class="form-control" placeholder="تیم میزبان" id="homeTeamFilter"></div>
+            <div class="col-md-3"><input class="form-control" placeholder="تیم میهمان" id="awayTeamFilter"></div>
+          </div>
+          <button class="btn btn-primary mb-3" id="searchBtn">جستجو</button>
+          <table class="table table-bordered">
+            <thead><tr><th>شماره</th><th>ورزش</th><th>میزبان</th><th>میهمان</th><th>شهر</th><th>رده</th><th>قیمت</th><th>ظرفیت</th><th>عملیات</th></tr></thead>
+            <tbody id="ticketsTable"></tbody>
+          </table>
+        </div>
+        <!-- Bookings Tab -->
+        <div class="tab-pane fade" id="bookingsTab">
+          <button class="btn btn-secondary mb-3" id="loadBookingsBtn">بارگذاری تاریخچه</button>
+          <table class="table">
+            <thead><tr><th>شماره رزرو</th><th>وضعیت</th><th>تاریخ رزرو</th><th>رده</th><th>قیمت</th><th>ورزش</th><th>تیم‌ها</th><th>عملیات</th></tr></thead>
+            <tbody id="bookingsTable"></tbody>
+          </table>
+        </div>
+        <!-- Profile Tab -->
+        <div class="tab-pane fade" id="profileTab">
+          <input class="form-control mb-2" id="profileFullname" placeholder="نام کامل">
+          <input class="form-control mb-2" id="profileCity" placeholder="شهر">
+          <button class="btn btn-success" id="updateProfileBtn">به‌روزرسانی</button>
+        </div>
+        <!-- Admin Panel -->
+        <div class="tab-pane fade" id="adminPanel">
+          <h4>گزارش‌های کاربران</h4>
+          <button class="btn btn-info mb-2" id="loadAdminReportsBtn">بارگذاری گزارش‌ها</button>
+          <table class="table" id="adminReportsTable">
+            <thead><tr><th>شماره</th><th>گزارش‌دهنده</th><th>دسته</th><th>توضیحات</th><th>وضعیت</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          
+          <h4>مدیریت رزروها</h4>
+          <button class="btn btn-info mb-2" id="loadAdminReservationsBtn">بارگذاری رزروها</button>
+          <table class="table" id="adminReservationsTable">
+            <thead><tr><th>شماره</th><th>کاربر</th><th>ورزش</th><th>تیم‌ها</th><th>رده</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const api = axios.create({ baseURL: 'http://localhost:3000/api' });
+    let token = localStorage.getItem('token') || null;
+    let user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    // UI update based on auth
+    function updateUI() {
+      if (token && user) {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('mainPanel').style.display = 'block';
+        document.getElementById('userArea').innerHTML = `👤 ${user.fullname} (${user.role}) <button class="btn btn-sm btn-outline-light" onclick="logout()">خروج</button>`;
+        if (user.role === 'support') document.getElementById('adminTab').style.display = 'block';
+        // Load profile fields
+        document.getElementById('profileFullname').value = user.fullname || '';
+        document.getElementById('profileCity').value = user.city || '';
+      } else {
+        document.getElementById('authSection').style.display = 'block';
+        document.getElementById('mainPanel').style.display = 'none';
+        document.getElementById('userArea').innerHTML = '';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      token = null; user = null;
+      updateUI();
+    }
+
+    // Auth actions
+    let isRegisterMode = false;
+    document.getElementById('toggleRegisterBtn').addEventListener('click', () => {
+      isRegisterMode = !isRegisterMode;
+      document.getElementById('authTitle').innerText = isRegisterMode ? 'ثبت‌نام' : 'ورود / ثبت‌نام';
+      document.getElementById('passwordGroup').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('fullnameGroup').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('cityGroup').style.display = isRegisterMode ? 'block' : 'none';
+      document.getElementById('requestOtpBtn').innerText = isRegisterMode ? 'ثبت‌نام' : 'دریافت کد OTP';
+    });
+
+    document.getElementById('requestOtpBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      if (isRegisterMode) {
+        const fullname = document.getElementById('fullname').value;
+        const password = document.getElementById('password').value;
+        const city = document.getElementById('city').value;
+        try {
+          const res = await api.post('/auth/signup', { fullname, email, password, city });
+          token = res.data.token; user = res.data.user;
+          localStorage.setItem('token', token); localStorage.setItem('user', JSON.stringify(user));
+          updateUI();
+        } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+      } else {
+        try {
+          const res = await api.post('/auth/request-otp', { email });
+          document.getElementById('otpSection').style.display = 'block';
+          alert('کد OTP (در کنسول سرور هم نمایش داده می‌شود): ' + res.data.otp);
+        } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+      }
+    });
+
+    document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const otp = document.getElementById('otpCode').value;
+      try {
+        const res = await api.post('/auth/verify-otp', { email, otp });
+        token = res.data.token; user = res.data.user;
+        localStorage.setItem('token', token); localStorage.setItem('user', JSON.stringify(user));
+        updateUI();
+      } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+    });
+
+    // Search tickets
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+      const params = {};
+      const sport = document.getElementById('sportFilter').value;
+      const city = document.getElementById('cityFilter').value;
+      const home = document.getElementById('homeTeamFilter').value;
+      const away = document.getElementById('awayTeamFilter').value;
+      if(sport) params.sport_type = sport;
+      if(city) params.city = city;
+      if(home) params.home_team = home;
+      if(away) params.away_team = away;
+      try {
+        const res = await api.get('/tickets/search', { params });
+        const tbody = document.getElementById('ticketsTable');
+        tbody.innerHTML = '';
+        res.data.forEach(t => {
+          tbody.innerHTML += `<tr>
+            <td>${t.id}</td><td>${t.sport_type}</td><td>${t.home_team}</td><td>${t.away_team}</td>
+            <td>${t.venue_city}</td><td>${t.seat_category}</td><td>${t.price}</td><td>${t.remaining}</td>
+            <td><button class="btn btn-sm btn-success" onclick="reserveTicket(${t.id})">رزرو</button></td>
+          </tr>`;
+        });
+      } catch(e) { alert('خطا در جستجو'); }
+    });
+
+    async function reserveTicket(ticketId) {
+      if (!token) { alert('وارد شوید'); return; }
+      try {
+        const res = await api.post('/reservations/reserve', { ticket_id: ticketId }, { headers: { Authorization: `Bearer ${token}` } });
+        alert('رزرو شد. شماره رزرو: ' + res.data.reservation.id);
+        // Optionally pay
+        if (confirm('پرداخت انجام شود؟')) {
+          await api.post('/reservations/pay', { reservation_id: res.data.reservation.id, method: 'card' }, { headers: { Authorization: `Bearer ${token}` } });
+          alert('پرداخت موفق');
+        }
+      } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+    }
+
+    // Bookings
+    document.getElementById('loadBookingsBtn').addEventListener('click', async () => {
+      try {
+        const res = await api.get('/reservations/bookings', { headers: { Authorization: `Bearer ${token}` } });
+        const tbody = document.getElementById('bookingsTable');
+        tbody.innerHTML = '';
+        res.data.forEach(b => {
+          tbody.innerHTML += `<tr>
+            <td>${b.id}</td><td>${b.status}</td><td>${new Date(b.reserved_at).toLocaleDateString('fa-IR')}</td>
+            <td>${b.seat_category}</td><td>${b.price}</td><td>${b.sport_type}</td>
+            <td>${b.home_team} - ${b.away_team}</td>
+            <td>${b.status === 'reserved' || b.status === 'paid' ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.id})">کنسلی</button>` : ''}</td>
+          </tr>`;
+        });
+      } catch(e) { alert('خطا'); }
+    });
+
+    async function cancelBooking(id) {
+      try {
+        await api.post('/reservations/cancel', { reservation_id: id }, { headers: { Authorization: `Bearer ${token}` } });
+        alert('کنسل شد');
+        document.getElementById('loadBookingsBtn').click();
+      } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+    }
+
+    // Profile update
+    document.getElementById('updateProfileBtn').addEventListener('click', async () => {
+      const fullname = document.getElementById('profileFullname').value;
+      const city = document.getElementById('profileCity').value;
+      try {
+        await api.put('/auth/profile', { fullname, city }, { headers: { Authorization: `Bearer ${token}` } });
+        user.fullname = fullname; user.city = city;
+        localStorage.setItem('user', JSON.stringify(user));
+        alert('پروفایل به‌روز شد');
+        updateUI();
+      } catch(e) { alert('خطا'); }
+    });
+
+        // Admin: load reports
+    document.getElementById('loadAdminReportsBtn').addEventListener('click', async () => {
+      try {
+        const res = await api.get('/admin/reports', { headers: { Authorization: `Bearer ${token}` } });
+        const tbody = document.getElementById('adminReportsTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        res.data.forEach(r => {
+          tbody.innerHTML += `<tr><td>${r.id}</td><td>${r.reporter}</td><td>${r.category}</td><td>${r.description}</td><td>${r.status}</td></tr>`;
+        });
+      } catch(e) { alert('خطا در بارگذاری گزارش‌ها'); }
+    });
+
+    // Load reservations for admin
+    document.getElementById('loadAdminReservationsBtn').addEventListener('click', async () => {
+      try {
+        const res = await api.get('/admin/reservations', { headers: { Authorization: `Bearer ${token}` } });
+        const tbody = document.getElementById('adminReservationsTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        res.data.forEach(r => {
+          tbody.innerHTML += `<tr>
+            <td>${r.id}</td><td>${r.user_name}</td><td>${r.sport_type}</td>
+            <td>${r.home_team} - ${r.away_team}</td><td>${r.seat_category}</td><td>${r.status}</td>
+            <td>
+              <button class="btn btn-sm btn-success" onclick="adminUpdateReservation(${r.id}, 'approved')">تأیید</button>
+              <button class="btn btn-sm btn-danger" onclick="adminUpdateReservation(${r.id}, 'cancelled')">لغو</button>
+            </td>
+          </tr>`;
+        });
+      } catch(e) { alert('خطا در بارگذاری رزروها'); }
+    });
+
+    async function adminUpdateReservation(id, status) {
+      try {
+        const res = await api.put(`/admin/reservations/${id}`, { status: status }, { headers: { Authorization: `Bearer ${token}` } });
+        console.log('Admin response:', res.data);
+        alert('تغییر وضعیت انجام شد.');
+        // بارگذاری مجدد رزروها با تأخیر کوتاه
+        setTimeout(() => {
+          document.getElementById('loadAdminReservationsBtn').click();
+        }, 100);
+      } catch(e) {
+        console.error(e);
+        alert(e.response?.data?.error || 'خطا');
+      }
+    }
+    
+    // Admin functions
+    document.getElementById('loadAdminReportsBtn').addEventListener('click', async () => {
+      try {
+        const res = await api.get('/admin/reports', { headers: { Authorization: `Bearer ${token}` } });
+        const tbody = document.getElementById('adminReportsTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        res.data.forEach(r => {
+          tbody.innerHTML += `<tr><td>${r.id}</td><td>${r.reporter}</td><td>${r.category}</td><td>${r.description}</td><td>${r.status}</td></tr>`;
+        });
+      } catch(e) { alert('خطا در بارگذاری گزارش‌ها'); }
+    });
+
+    document.getElementById('adminUpdateBtn').addEventListener('click', async () => {
+      const id = document.getElementById('adminReservationId').value;
+      const action = document.getElementById('adminAction').value;
+      try {
+        const res = await api.put(`/admin/reservations/${id}`, { status: action }, { headers: { Authorization: `Bearer ${token}` } });
+        alert('انجام شد');
+      } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+    });
+
+    updateUI();
+
+    // Load reservations for admin
+    document.getElementById('loadAdminReservationsBtn').addEventListener('click', async () => {
+      try {
+        const res = await api.get('/admin/reservations', { headers: { Authorization: `Bearer ${token}` } });
+        const tbody = document.getElementById('adminReservationsTable').querySelector('tbody');
+        tbody.innerHTML = '';
+        res.data.forEach(r => {
+          tbody.innerHTML += `<tr>
+            <td>${r.id}</td><td>${r.user_name}</td><td>${r.sport_type}</td>
+            <td>${r.home_team} - ${r.away_team}</td><td>${r.seat_category}</td><td>${r.status}</td>
+            <td>
+              <button class="btn btn-sm btn-success" onclick="adminUpdateReservation(${r.id}, 'approved')">تأیید</button>
+              <button class="btn btn-sm btn-danger" onclick="adminUpdateReservation(${r.id}, 'cancelled')">لغو</button>
+            </td>
+          </tr>`;
+        });
+      } catch(e) { alert('خطا در بارگذاری رزروها'); }
+    });
+
+    async function adminUpdateReservation(id, status) {
+      try {
+        await api.put(`/admin/reservations/${id}`, { status: status }, { headers: { Authorization: `Bearer ${token}` } });
+        alert('انجام شد');
+        document.getElementById('loadAdminReservationsBtn').click(); // refresh list
+      } catch(e) { alert(e.response?.data?.error || 'خطا'); }
+    }
+    // Auto load search on page load
+    document.getElementById('searchBtn').click();
+  </script>
+</body>
+</html>
