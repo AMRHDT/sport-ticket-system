@@ -4,7 +4,7 @@ A comprehensive **full-stack sports ticket reservation and purchase platform** f
 
 The system allows users to **search, filter, reserve, purchase, cancel, and manage tickets**, while providing a dedicated **admin/support panel** for managing reservations and reviewing user reports.
 
-This repository contains the complete implementation of **four mandatory project phases**, covering database design, SQL queries, backend APIs, frontend UI, Redis caching, and Elasticsearch-ready search optimization.
+This repository contains the complete implementation of **four mandatory project phases**, covering database design, SQL queries, backend APIs, frontend UI, Redis caching.
 
 ---
 
@@ -56,12 +56,6 @@ This repository contains the complete implementation of **four mandatory project
 * Ticket search-result caching
 * Cache invalidation when profile data changes
 
-### Elasticsearch
-
-* Elasticsearch-ready ticket search
-* Automatic fallback to SQL when Elasticsearch is unavailable
-* Script for indexing tickets from PostgreSQL
-* Shared ticket IDs between PostgreSQL and Elasticsearch
 
 ---
 
@@ -75,7 +69,7 @@ This repository contains the complete implementation of **four mandatory project
 | Caching / OTP    | Redis                                 |
 | Authentication   | JWT                                   |
 | Frontend         | HTML, Bootstrap 5, Vanilla JavaScript |
-| Search           | Elasticsearch                         |
+| Search           |                                       |
 | Password Hashing | bcrypt                                |
 
 ---
@@ -107,7 +101,6 @@ Make sure the following are installed:
 * [Node.js](https://nodejs.org/)
 * PostgreSQL
 * Redis *(optional, but recommended)*
-* Elasticsearch *(optional)*
 
 ---
 
@@ -530,24 +523,6 @@ curl -X GET http://localhost:3000/api/reservations/bookings \
 
 ---
 
-# Elasticsearch Integration
-
-The project includes an Elasticsearch client and a dedicated indexing script.
-
-### Related Files
-
-```text
-utils/elasticsearch.js
-indexTickets.js
-```
-
-### Index Tickets
-
-After starting Elasticsearch, run:
-
-```bash
-node indexTickets.js
-```
 
 The ticket search system works as follows:
 
@@ -566,11 +541,6 @@ The ticket search system works as follows:
                         └────────┬────────┘
                                  ▼
                               Results
-```
-
-If Elasticsearch is unavailable, the application automatically falls back to PostgreSQL/SQL-based search.
-
----
 
 # Project Structure
 
@@ -592,18 +562,16 @@ sport-ticket-system/
 │
 ├── utils/
 │   ├── redis.js
-│   └── elasticsearch.js
 │
 ├── public/
 │   └── index.html
 │
-├── sql/
+├── ERD & queries/
 │   ├── schema.sql
 │   ├── seed.sql
 │   ├── queries.sql
 │   └── procedures.sql
 │
-├── indexTickets.js
 ├── .env
 ├── .gitignore
 ├── package.json
@@ -630,8 +598,8 @@ sport-ticket-system/
                  │               │               │
                  ▼               ▼               ▼
           ┌────────────┐  ┌────────────┐  ┌──────────────┐
-          │ PostgreSQL │  │   Redis    │  │ Elasticsearch│
-          │  Database  │  │ Cache/OTP  │  │    Search    │
+          │ PostgreSQL │  │   Redis    │  │              │
+          │  Database  │  │ Cache/OTP  │  │              │
           └────────────┘  └────────────┘  └──────────────┘
 ```
 
@@ -649,7 +617,6 @@ This project demonstrates the integration of:
 * JWT authentication
 * OTP-based login
 * Redis caching
-* Elasticsearch search
 * Frontend development
 * Reservation and payment workflows
 * Role-based administration
